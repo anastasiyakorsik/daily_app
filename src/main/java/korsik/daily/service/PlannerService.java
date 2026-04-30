@@ -12,9 +12,9 @@ import java.util.List;
 
 public class PlannerService {
 
-    private List<Task> tasks;
-    private List<Note> notes;
-    private List<Expense> expenses;
+    private List<Task> tasks = new ArrayList<>();
+    private List<Note> notes = new ArrayList<>();
+    private List<Expense> expenses = new ArrayList<>();
 
     public void addTask(Task task){
         //todo: check if provided task can be added
@@ -25,6 +25,10 @@ public class PlannerService {
             System.out.println("Failed to save task");
             throw new RuntimeException(e);
         }
+    }
+
+    public List<Task> getAllTasks(){
+        return tasks;
     }
 
     public void removeTaskById(Long taskId){
@@ -62,11 +66,14 @@ public class PlannerService {
         return tasksWithGivenStatus;
     }
 
-    public List<Task> findTasksByTag(Tag tag){
+    public List<Task> findTasksByTagName(String tagName){
         List<Task> tasksWithGivenTag = new ArrayList<>();
         for (Task task : tasks){
-            if (task.getTags().contains(tag)){
-                tasksWithGivenTag.add(task);
+            List<Tag> taskTags = task.getTags();
+            for (Tag tag : taskTags){
+                if (tag.getName().equals(tagName)){
+                    tasksWithGivenTag.add(task);
+                }
             }
         }
         return tasksWithGivenTag;
@@ -75,7 +82,7 @@ public class PlannerService {
     public List<Task> getOverdueTasks(LocalDateTime datetime){
         List<Task> overdueTasks = new ArrayList<>();
         for (Task task : tasks){
-            if (task.getDeadline().isAfter(datetime) &&
+            if (task.getDeadline().isBefore(datetime) &&
                     !task.getStatus().equals(TaskStatus.DONE) && !task.getStatus().equals(TaskStatus.CANCELLED)){
                 overdueTasks.add(task);
             }

@@ -11,14 +11,18 @@ public class Note {
     private List<Tag> tags;
     private Date createdAt;
     private Date updateAt;
+    private NoteLinkType noteLinkType;
+    private Long noteLinkId;
 
-    public Note(Long id, String title, String content, List<Tag> tags, Date createdAt, Date updateAt) {
+    public Note(Long id, String title, String content, List<Tag> tags, Date createdAt, Date updateAt, NoteLinkType noteLinkType, Long noteLinkId) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.tags = tags;
         this.createdAt = createdAt;
         this.updateAt = updateAt;
+        this.noteLinkType = noteLinkType;
+        this.noteLinkId = noteLinkId;
     }
 
     public Long getId() {
@@ -67,6 +71,22 @@ public class Note {
 
     public void setUpdateAt(Date updateAt) {
         this.updateAt = updateAt;
+    }
+
+    public NoteLinkType getNoteLinkType() {
+        return noteLinkType;
+    }
+
+    public void setNoteLinkType(NoteLinkType noteLinkType) {
+        this.noteLinkType = noteLinkType;
+    }
+
+    public Long getNoteLinkId() {
+        return noteLinkId;
+    }
+
+    public void setNoteLinkId(Long noteLinkId) {
+        this.noteLinkId = noteLinkId;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package korsik.daily.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -9,18 +10,27 @@ public class Note {
     private String title;
     private String content;
     private List<Tag> tags;
-    private Date createdAt;
-    private Date updateAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updateAt;
     private NoteLinkType noteLinkType;
     private Long noteLinkId;
 
-    public Note(Long id, String title, String content, List<Tag> tags, Date createdAt, Date updateAt, NoteLinkType noteLinkType, Long noteLinkId) {
+    private static final int MAX_TITLE_LENGTH = 120;
+
+    public Note(Long id, String title, String content) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.tags = tags;
-        this.createdAt = createdAt;
-        this.updateAt = updateAt;
+        this.createdAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
+
+    public Note(Long id, String title, String content, NoteLinkType noteLinkType, Long noteLinkId) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.createdAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
         this.noteLinkType = noteLinkType;
         this.noteLinkId = noteLinkId;
     }
@@ -29,16 +39,29 @@ public class Note {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        try {
+            if (title == null){
+                throw new Exception("Note title can not be null.");
+            }
+
+            if (title.isBlank()){
+                throw new Exception("Note title can not be empty or contains only spaces.");
+            }
+
+            if (title.length() > MAX_TITLE_LENGTH){
+                throw new Exception("Note title. Please, make it shorter");
+            }
+
+            this.title = title.trim();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public String getContent() {
@@ -53,24 +76,20 @@ public class Note {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
+    public void addTag(Tag tag) {
+        tags.add(tag);
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdateAt() {
+    public LocalDateTime getUpdateAt() {
         return updateAt;
     }
 
-    public void setUpdateAt(Date updateAt) {
-        this.updateAt = updateAt;
+    public void setUpdateAt() {
+        this.updateAt = LocalDateTime.now();
     }
 
     public NoteLinkType getNoteLinkType() {
@@ -86,7 +105,12 @@ public class Note {
     }
 
     public void setNoteLinkId(Long noteLinkId) {
-        this.noteLinkId = noteLinkId;
+        if (!this.id.equals(noteLinkId)){
+            this.noteLinkId = noteLinkId;
+        }
+        else{
+            throw new RuntimeException("Note can not be linked to itself");
+        }
     }
 
     @Override

@@ -82,7 +82,7 @@ public class Task {
                 throw new Exception("Title is too big. Please, make it shorter");
             }
 
-            this.title = title;
+            this.title = title.trim();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

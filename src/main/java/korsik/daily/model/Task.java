@@ -2,35 +2,37 @@ package korsik.daily.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 public class Task {
     private Long id;
     private String title;
-    private String description;
-    private LocalDateTime deadline;
+    private Optional<String> description;
+    private Optional<LocalDateTime> deadline;
     private TaskStatus status;
     private Priority priority;
-    private List<Tag> tags;
+    private Set<Tag> tags;
+
+    private static final int MAX_TITLE_LENGTH = 120;
+
+    private static final int MAX_DESCRIPTION_LENGTH = 2000;
+
+    public Task() {
+    }
 
     public Task(Long id,
                 String title,
-                String description,
-                LocalDateTime deadline,
                 TaskStatus status,
                 Priority priority) {
         this.id = id;
-        this.title = title;
-        this.description = description;
-        this.deadline = deadline;
+        setTitle(title);
         this.status = status;
         this.priority = priority;
-        this.tags = new ArrayList<>();
-    }
-
-    public void addTag(Tag tag) {
-        tags.add(tag);
+        this.tags = new HashSet<>();
     }
 
     public Long getId() {
@@ -42,11 +44,16 @@ public class Task {
     }
 
     public String getDescription() {
-        return description;
+        return description.get();
     }
 
     public LocalDateTime getDeadline() {
-        return deadline;
+        if (deadline.isEmpty()){
+            return null;
+        }
+        else{
+            return deadline.get();
+        }
     }
 
     public TaskStatus getStatus() {
@@ -57,12 +64,53 @@ public class Task {
         return priority;
     }
 
-    public List<Tag> getTags() {
+    public Set<Tag> getTags() {
         return tags;
+    }
+
+    public void setTitle(String title) {
+        try {
+            if (title == null){
+                 throw new Exception("Title of task can not be null.");
+            }
+
+            if (title.isBlank()){
+                throw new Exception("Title of task can not be empty or contains only spaces.");
+            }
+
+            if (title.length() > MAX_TITLE_LENGTH){
+                throw new Exception("Title is too big. Please, make it shorter");
+            }
+
+            this.title = title;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void setDescription(String description){
+        try {
+            if (description.length() > MAX_DESCRIPTION_LENGTH){
+                throw new Exception("Description is too big. Please, make it shorter");
+            }
+
+            this.description = Optional.ofNullable(description);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setDeadline(LocalDateTime deadline){
+        this.deadline = Optional.ofNullable(deadline);
     }
 
     public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    public void addTag(Tag tag) {
+        tags.add(tag);
     }
 
     @Override

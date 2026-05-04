@@ -1,8 +1,11 @@
 package korsik.daily.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Note {
 
@@ -14,6 +17,7 @@ public class Note {
     private LocalDateTime updateAt;
     private NoteLinkType noteLinkType;
     private Long noteLinkId;
+    private HashMap<Long, NoteLinkType> noteLinks;
 
     private static final int MAX_TITLE_LENGTH = 120;
 
@@ -23,6 +27,7 @@ public class Note {
         this.content = content;
         this.createdAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
+        noteLinks = new HashMap<>();
     }
 
     public Note(Long id, String title, String content, NoteLinkType noteLinkType, Long noteLinkId) {
@@ -33,6 +38,7 @@ public class Note {
         this.updateAt = LocalDateTime.now();
         this.noteLinkType = noteLinkType;
         this.noteLinkId = noteLinkId;
+        noteLinks = new HashMap<>();
     }
 
     public Long getId() {
@@ -92,26 +98,21 @@ public class Note {
         this.updateAt = LocalDateTime.now();
     }
 
-    public NoteLinkType getNoteLinkType() {
-        return noteLinkType;
-    }
-
-    public void setNoteLinkType(NoteLinkType noteLinkType) {
-        this.noteLinkType = noteLinkType;
-    }
-
-    public Long getNoteLinkId() {
-        return noteLinkId;
-    }
-
-    public void setNoteLinkId(Long noteLinkId) {
-        if (!this.id.equals(noteLinkId)){
-            this.noteLinkId = noteLinkId;
+    public void addNoteLink(Long newNoteLinkId, NoteLinkType newNoteLinkType){
+        if (!this.id.equals(newNoteLinkId)){
+            if (!noteLinks.containsKey(newNoteLinkId)){
+                noteLinks.put(newNoteLinkId, newNoteLinkType);
+            }
+            else{
+                throw new RuntimeException("Note is already linked to given note");
+            }
         }
         else{
             throw new RuntimeException("Note can not be linked to itself");
         }
     }
+
+    public HashMap<Long, NoteLinkType> getNoteLinks() {return noteLinks;}
 
     @Override
     public String toString() {

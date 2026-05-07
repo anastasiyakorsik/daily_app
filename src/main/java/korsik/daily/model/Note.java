@@ -6,13 +6,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Note {
 
     private Long id;
     private String title;
     private String content;
-    private List<Tag> tags;
+    private Set<Tag> tags;
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
     private NoteLinkType noteLinkType;
@@ -78,7 +79,7 @@ public class Note {
         this.content = content;
     }
 
-    public List<Tag> getTags() {
+    public Set<Tag> getTags() {
         return tags;
     }
 

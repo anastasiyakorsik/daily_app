@@ -36,6 +36,7 @@ public class TaskService {
         task.setStatus(newStatus);
     }
 
+    //todo: think about check containing
     public void addTagToTask(Task task, Tag tag){
         if (!task.getTags().contains(tag)){
             task.addTag(tag);
@@ -149,6 +150,12 @@ public class TaskService {
     public List<Task> sortTasksByDeadlineFromEarliestToLatest() {
         List<Task> sortedTask = tasks;
         sortedTask.sort(Comparator.comparing(Task::getDeadline));
+        return sortedTask;
+    }
+
+    public List<Task> sortTasksByCreationDateTimeEarliestToLatest() {
+        List<Task> sortedTask = tasks;
+        sortedTask.sort(Comparator.comparing(Task::getCreatedAt));
         return sortedTask;
     }
 

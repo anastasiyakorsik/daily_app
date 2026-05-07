@@ -11,6 +11,7 @@ import java.util.Set;
 public class Task {
     private Long id;
     private String title;
+    private LocalDateTime createdAt;
     private Optional<String> description;
     private Optional<LocalDateTime> deadline;
     private TaskStatus status;
@@ -30,6 +31,7 @@ public class Task {
                 Priority priority) {
         this.id = id;
         setTitle(title);
+        this.createdAt = LocalDateTime.now();
         this.status = status;
         this.priority = priority;
         this.tags = new HashSet<>();
@@ -42,6 +44,8 @@ public class Task {
     public String getTitle() {
         return title;
     }
+
+    public LocalDateTime getCreatedAt() {return createdAt;}
 
     public String getDescription() {
         return description.get();

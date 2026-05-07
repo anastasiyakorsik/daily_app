@@ -16,8 +16,6 @@ public class Note {
     private Set<Tag> tags;
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
-    private NoteLinkType noteLinkType;
-    private Long noteLinkId;
     private HashMap<Long, NoteLinkType> noteLinks;
 
     private static final int MAX_TITLE_LENGTH = 120;
@@ -28,17 +26,6 @@ public class Note {
         this.content = content;
         this.createdAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
-        noteLinks = new HashMap<>();
-    }
-
-    public Note(Long id, String title, String content, NoteLinkType noteLinkType, Long noteLinkId) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.createdAt = LocalDateTime.now();
-        this.updateAt = LocalDateTime.now();
-        this.noteLinkType = noteLinkType;
-        this.noteLinkId = noteLinkId;
         noteLinks = new HashMap<>();
     }
 

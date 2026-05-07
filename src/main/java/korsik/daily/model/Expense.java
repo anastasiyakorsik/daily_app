@@ -10,25 +10,18 @@ public class Expense {
     private String category;
     private String comment;
     private Date date;
-    private List<Tag> tags;
     private Currency currency;
 
-    public Expense(Long id, Double amount, String category, String comment, Date date, List<Tag> tags, Currency currency) {
+    public Expense(Long id, Double amount, String category, Date date, Currency currency) {
         this.id = id;
         this.amount = amount;
         this.category = category;
-        this.comment = comment;
         this.date = date;
-        this.tags = tags;
         this.currency = currency;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Double getAmount() {
@@ -63,14 +56,6 @@ public class Expense {
         this.date = date;
     }
 
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
     public Currency getCurrency() {
         return currency;
     }
@@ -87,7 +72,6 @@ public class Expense {
                 ", category='" + category + '\'' +
                 ", comment='" + comment + '\'' +
                 ", date=" + date +
-                ", tags=" + tags +
                 ", currency=" + currency +
                 '}';
     }

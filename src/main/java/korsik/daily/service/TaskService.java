@@ -11,20 +11,22 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class TaskService {
 
-    private List<Task> tasks = new ArrayList<>();
+    private Map<Long, Task> tasks = new HashMap<>();
 
-    public List<Task> getAllTasks(){
+    public Map<Long, Task> getAllTasks(){
         return tasks;
     }
 
     public void addTask(Task task){
         try {
-            tasks.add(task);
+            tasks.put(task.getId(), task);
             System.out.println("Given task was successfully saved");
         } catch (Exception e) {
             System.out.println("Failed to save task");
@@ -48,12 +50,7 @@ public class TaskService {
 
     public void removeTaskById(Long taskId){
         try {
-            for (Task task : tasks){
-                if (task.getId().equals(taskId)){
-                    tasks.remove(task);
-                    return;
-                }
-            }
+            tasks.remove(taskId);
             System.out.println(String.format("Task with Id: %d is not found in saved tasks", taskId));
         } catch (Exception e) {
             System.out.println("Failed to remove provided task");
@@ -62,10 +59,8 @@ public class TaskService {
     }
 
     public Task findTaskById(Long taskId){
-        for (Task task : tasks){
-            if (task.getId().equals(taskId)){
-                return task;
-            }
+        if (tasks.keySet().contains(taskId)){
+            return tasks.get(taskId);
         }
         System.out.println(String.format("Task with Id: %d is not found in saved tasks", taskId));
         return null;
@@ -73,7 +68,7 @@ public class TaskService {
 
     public List<Task> findTasksByTaskStatus(TaskStatus taskStatus){
         List<Task> tasksWithGivenStatus = new ArrayList<>();
-        for (Task task : tasks){
+        for (Task task : tasks.values()){
             if (task.getStatus().equals(taskStatus)){
                 tasksWithGivenStatus.add(task);
             }
@@ -83,7 +78,7 @@ public class TaskService {
 
     public List<Task> findTasksByPriority(Priority taskPriority){
         List<Task> tasksWithGivenPriority = new ArrayList<>();
-        for (Task task : tasks){
+        for (Task task : tasks.values()){
             if (task.getPriority().equals(taskPriority)){
                 tasksWithGivenPriority.add(task);
             }
@@ -103,7 +98,7 @@ public class TaskService {
 
     public List<Task> findTasksByTagName(String tagName){
         List<Task> tasksWithGivenTag = new ArrayList<>();
-        for (Task task : tasks){
+        for (Task task : tasks.values()){
             Set<Tag> taskTags = task.getTags();
             for (Tag tag : taskTags){
                 if (tag.getName().equals(tagName)){
@@ -116,7 +111,7 @@ public class TaskService {
 
     public List<Task> getOverdueTasks(LocalDateTime datetime){
         List<Task> overdueTasks = new ArrayList<>();
-        for (Task task : tasks){
+        for (Task task : tasks.values()){
             if (task.getDeadline().isBefore(datetime) &&
                     !task.getStatus().equals(TaskStatus.DONE) && !task.getStatus().equals(TaskStatus.CANCELLED)){
                 overdueTasks.add(task);
@@ -128,7 +123,7 @@ public class TaskService {
     public List<Task> getTodayTasks(){
         LocalDate today = LocalDateTime.now().toLocalDate();
         List<Task> todayTasks = new ArrayList<>();
-        for (Task task : tasks){
+        for (Task task : tasks.values()){
             if (task.getDeadline().toLocalDate().isEqual(today) &&
                     !task.getStatus().equals(TaskStatus.DONE) && !task.getStatus().equals(TaskStatus.CANCELLED)){
                 todayTasks.add(task);
@@ -139,7 +134,7 @@ public class TaskService {
 
     public List<Task> getTasksWithoutDeadline(){
         List<Task> tasksWithoutDeadline = new ArrayList<>();
-        for (Task task : tasks){
+        for (Task task : tasks.values()){
             if (task.getDeadline() == null){
                 tasksWithoutDeadline.add(task);
             }
@@ -148,13 +143,13 @@ public class TaskService {
     }
 
     public List<Task> sortTasksByDeadlineFromEarliestToLatest() {
-        List<Task> sortedTask = tasks;
+        List<Task> sortedTask = tasks.values().stream().toList();
         sortedTask.sort(Comparator.comparing(Task::getDeadline));
         return sortedTask;
     }
 
     public List<Task> sortTasksByCreationDateTimeEarliestToLatest() {
-        List<Task> sortedTask = tasks;
+        List<Task> sortedTask = tasks.values().stream().toList();
         sortedTask.sort(Comparator.comparing(Task::getCreatedAt));
         return sortedTask;
     }

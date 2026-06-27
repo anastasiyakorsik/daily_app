@@ -1,67 +1,141 @@
 package korsik.daily.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BinaryOperator;
 
+//todo builder
 public class Expense {
 
-    private Long id;
-    private Double amount;
-    private String category;
+    private final Long id;
+    private final BigDecimal amount; //todo прочитать про double vs bigdeciaml
+    private ExpenseCategory category;
     private String comment;
-    private Date date;
-    private Currency currency;
+    private final LocalDateTime date;
+    private final Currency currency;
 
-    public Expense(Long id, Double amount, String category, Date date, Currency currency) {
-        this.id = id;
-        this.amount = amount;
-        this.category = category;
-        this.date = date;
-        this.currency = currency;
+    private static Currency defaultCurrency = Currency.RUB;
+
+    public Expense(Builder builder) {
+        this.id = builder.id;
+        this.amount = builder.amount;
+        this.category = builder.category;
+        this.comment = builder.comment;
+        this.date = builder.date;
+        this.currency = builder.currency;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
+//    public Expense withAmount(BigDecimal amount) {
+//        return new Expense(
+//                this.id,
+//                amount,
+//                this.category,
+//                this.date,
+//                this.currency
+//        );
+//    }
 
-    public String getCategory() {
+    public ExpenseCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+//    public Expense withCategory(ExpenseCategory category) {
+//        return new Expense(
+//                this.id,
+//                this.amount,
+//                category,
+//                this.date,
+//                this.currency
+//        );
+//    }
 
     public String getComment() {
         return comment;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
+//    public Expense withComment(String comment) {
+//        return new Expense(
+//                this.id,
+//                this.amount,
+//                this.category,
+//                this.date,
+//                comment
+//        );
+//    }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 
     public Currency getCurrency() {
         return currency;
     }
 
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
+    public static Builder builder(){
+        return new Builder();
+    }
+
+    public static class Builder {
+        private Long id;
+        private BigDecimal amount; //todo прочитать про double vs bigdeciaml
+        private ExpenseCategory category;
+        private String comment;
+        private LocalDateTime date;
+        private Currency currency;
+
+        public Builder id(Long id){
+            this.id = Objects.requireNonNull(id, "id must not be null");
+            return this;
+        }
+
+        public Builder amount(BigDecimal amount){
+            this.amount = Objects.requireNonNull(amount, "amount must not be null");
+            return this;
+        }
+
+        public Builder category(ExpenseCategory category){
+            this.category = category;
+            return this;
+        }
+
+        public Builder comment(String comment){
+            this.comment = comment;
+            return this;
+        }
+
+        public Builder date(LocalDateTime date){
+            this.date = Objects.requireNonNull(date, "date must not be null");
+            return this;
+        }
+
+        public Builder currency(Currency currency){
+            if (currency == null){
+                currency = defaultCurrency;
+            }
+            this.currency = currency;
+            return this;
+        }
+
+        public Expense build(){
+            return new Expense(this);
+        }
+
+    }
+
+    public static void setDefaultCurrency(Currency currency){
+        defaultCurrency = Objects.requireNonNull(currency, "default currency must not be null");
     }
 
     @Override

@@ -1,18 +1,18 @@
 package korsik.daily.model;
 
-import java.util.Locale;
 import java.util.Objects;
 
-public class Tag {
+//todo подумать реально ли нужен id
+public class Label {
 
     private final Long id;
     private final String name;
     private String color;
     private final boolean custom;
 
-    private static final int MAX_TAG_NAME_LENGTH = 120;
+    private static final int MAX_LABEL_NAME_LENGTH = 120;
 
-    public Tag(Long id, String name, String color, boolean custom) {
+    public Label(Long id, String name, String color, boolean custom) {
         this.id = id;
         this.name = normalizeAndValidateName(name);
         this.color = color;
@@ -21,24 +21,21 @@ public class Tag {
 
     private String normalizeAndValidateName(String name) {
 
-        try {
             if (name == null){
-                throw new IllegalArgumentException("Tag name can not be null.");
+                throw new IllegalArgumentException("Label name can not be null.");
             }
 
             if (name.isBlank()){
-                throw new IllegalArgumentException("Tag name can not be empty or contains only spaces.");
+                throw new IllegalArgumentException("Label name can not be empty or contains only spaces.");
             }
 
-            if (name.length() > MAX_TAG_NAME_LENGTH){
-                throw new IllegalArgumentException("Tag name is too big. Please, make it shorter");
+            if (name.length() > MAX_LABEL_NAME_LENGTH){
+                throw new IllegalArgumentException("Label name is too big. Please, make it shorter.");
             }
 
             name = name.trim().toLowerCase();
             return name;
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     public Long getId() {
@@ -64,8 +61,8 @@ public class Tag {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Tag tag)) return false;
-        return Objects.equals(name, tag.name);
+        if (!(o instanceof Label label)) return false;
+        return Objects.equals(name, label.name);
     }
 
     @Override

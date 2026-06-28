@@ -37,43 +37,13 @@ public class Expense {
         return amount;
     }
 
-//    public Expense withAmount(BigDecimal amount) {
-//        return new Expense(
-//                this.id,
-//                amount,
-//                this.category,
-//                this.date,
-//                this.currency
-//        );
-//    }
-
     public ExpenseCategory getCategory() {
         return category;
     }
 
-//    public Expense withCategory(ExpenseCategory category) {
-//        return new Expense(
-//                this.id,
-//                this.amount,
-//                category,
-//                this.date,
-//                this.currency
-//        );
-//    }
-
     public String getComment() {
         return comment;
     }
-
-//    public Expense withComment(String comment) {
-//        return new Expense(
-//                this.id,
-//                this.amount,
-//                this.category,
-//                this.date,
-//                comment
-//        );
-//    }
 
     public LocalDateTime getDate() {
         return date;

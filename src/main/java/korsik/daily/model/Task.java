@@ -72,6 +72,21 @@ public class Task {
         labels.remove(Objects.requireNonNull(label, "Label must not be null"));
     }
 
+    public boolean containsLabel(String labelName) {
+        if (labelName == null){
+            throw new NullPointerException("label name must be set");
+        }
+        if (labels == null || labelName.isEmpty()){
+            return false;
+        }
+        for (Label label : labels){
+            if (label.getName().equals(labelName)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Builder builder() {
         return new Builder();
     }

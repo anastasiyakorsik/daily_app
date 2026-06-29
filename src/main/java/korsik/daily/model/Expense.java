@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
 
 //todo builder
@@ -37,12 +38,12 @@ public class Expense {
         return amount;
     }
 
-    public ExpenseCategory getCategory() {
-        return category;
+    public Optional<ExpenseCategory> getCategory() {
+        return Optional.of(category);
     }
 
-    public String getComment() {
-        return comment;
+    public Optional<String> getComment() {
+        return Optional.of(comment);
     }
 
     public LocalDateTime getDate() {
@@ -86,7 +87,9 @@ public class Expense {
         }
 
         public Builder date(LocalDateTime date){
-            this.date = Objects.requireNonNull(date, "date must not be null");
+            if (date == null){
+                date = LocalDateTime.now();
+            }
             return this;
         }
 

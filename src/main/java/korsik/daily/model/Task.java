@@ -43,8 +43,8 @@ public class Task {
         return createdAt;
     }
 
-    public String getDescription() {
-        return description;
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
     }
 
     public Optional<LocalDateTime> getDeadline() {
@@ -64,8 +64,8 @@ public class Task {
         return Set.copyOf(labels);
     }
 
-    public void addLabel(Label label) {
-        labels.add(Objects.requireNonNull(label, "Label must not be null"));
+    public boolean addLabel(Label label) {
+        return labels.add(Objects.requireNonNull(label, "Label must not be null"));
     }
 
     public void removeLabel(Label label) {

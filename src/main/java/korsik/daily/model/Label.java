@@ -7,15 +7,15 @@ public class Label {
 
     private final Long id;
     private final String name;
-    private String color;
+    private LabelColor color;
     private final boolean custom;
 
     private static final int MAX_LABEL_NAME_LENGTH = 120;
 
-    public Label(Long id, String name, String color, boolean custom) {
+    public Label(Long id, String name, LabelColor color, boolean custom) {
         this.id = id;
         this.name = normalizeAndValidateName(name);
-        this.color = color;
+        this.color = color == null ? LabelColor.TRANSPARENT : color;
         this.custom = custom;
     }
 
@@ -30,7 +30,7 @@ public class Label {
             }
 
             if (name.length() > MAX_LABEL_NAME_LENGTH){
-                throw new IllegalArgumentException("Label name is too big. Please, make it shorter.");
+                throw new IllegalArgumentException(String.format("Label name is too big. Please, make it shorter than %d.", MAX_LABEL_NAME_LENGTH));
             }
 
             name = name.trim().toLowerCase();
@@ -46,12 +46,13 @@ public class Label {
         return name;
     }
 
-    public String getColor() {
+    public LabelColor getColor() {
         return color;
     }
 
-    public void setColor(String color) {
-        this.color = color;
+    public void setColor(LabelColor color) {
+
+        this.color = Objects.requireNonNull(color, "color must be set");
     }
 
     public boolean isCustom() {

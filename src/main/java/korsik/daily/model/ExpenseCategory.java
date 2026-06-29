@@ -6,22 +6,22 @@ import java.util.Objects;
 public class ExpenseCategory {
     private final Long id;
     private final String name;
-    private String color;
+    private ExpenseCategoryColor color;
     private final boolean custom;
 
     private static final int MAX_EXPENSE_CATEGORY_NAME_LENGTH = 120;
 
-    public ExpenseCategory(Long id, String name, String color, boolean custom) {
-        this.id = id;
+    public ExpenseCategory(Long id, String name, ExpenseCategoryColor color, boolean custom) {
+        this.id = Objects.requireNonNull(id, "id must be set");
         this.name = normalizeAndValidateName(name);
-        this.color = color;
-        this.custom = custom;
+        this.color = color == null ? ExpenseCategoryColor.TRANSPARENT : color;
+        this.custom =  custom;
     }
 
     private String normalizeAndValidateName(String name) {
 
         if (name == null){
-            throw new IllegalArgumentException("Expense Category name can not be null.");
+            throw new NullPointerException("Expense Category name can not be null.");
         }
 
         if (name.isBlank()){
@@ -45,12 +45,13 @@ public class ExpenseCategory {
         return name;
     }
 
-    public String getColor() {
+    public ExpenseCategoryColor getColor() {
         return color;
     }
 
-    public void setColor(String color) {
-        this.color = color;
+    public void setColor(ExpenseCategoryColor color) {
+
+        this.color = Objects.requireNonNull(color, "color must be set");
     }
 
     public boolean isCustom() {

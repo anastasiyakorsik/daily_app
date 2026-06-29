@@ -1,6 +1,7 @@
 package korsik.daily.service;
 
 import korsik.daily.model.Label;
+import korsik.daily.model.Note;
 import korsik.daily.model.Priority;
 import korsik.daily.model.Task;
 import korsik.daily.model.TaskStatus;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -38,58 +40,84 @@ public class InMemoryTaskService {
                 Objects.requireNonNull(task, "task may not be null").getId(),
                 task
         );
-        System.out.println("Given task was successfully saved");
     }
 
-    public void changeTaskStatus(Task task, TaskStatus newStatus) {
-        task.changeStatus(newStatus);
-    }
-
-    //todo: think about check containing
-    public void addTagToTask(Task task, Label label) {
-        if (!task.getLabels().contains(label)) {
-            task.addLabel(label);
-        } else {
-            throw new RuntimeException("Given tag is already applied to task");
+    public boolean changeTaskStatus(Long taskId, TaskStatus newStatus) {
+        if (tasks.containsKey(Objects.requireNonNull(taskId, "taskId must be set"))){
+            tasks.get(taskId).changeStatus(Objects.requireNonNull(newStatus, "newStatus must be set"));
+            return true;
         }
+        return false;
     }
 
-    public void removeTaskById(Long taskId) {
-        try {
+    public boolean addLabelToTask(Long taskId, Label label) {
+        if (tasks.containsKey(Objects.requireNonNull(taskId, "taskId must be set"))) {
+            return tasks.get(taskId).addLabel(Objects.requireNonNull(label, "label must be set"));
+        }
+        return false;
+    }
+
+    public boolean removeTaskById(Long taskId) {
+        if (tasks.containsKey(Objects.requireNonNull(taskId, "taskId must be set"))) {
             tasks.remove(taskId);
-            System.out.println(String.format("Task with Id: %d is not found in saved tasks", taskId));
-        } catch (Exception e) {
-            System.out.println("Failed to remove provided task");
-            throw new RuntimeException(e);
+            return true;
         }
+        return false;
     }
 
-    public Task findTaskById(Long taskId) {
-        if (tasks.keySet().contains(taskId)) {
-            return tasks.get(taskId);
+    public Optional<Task> findTaskById(Long taskId) {
+        if (tasks.containsKey(Objects.requireNonNull(taskId, "taskId must be set"))) {
+            return Optional.ofNullable(tasks.get(taskId));
         }
-        System.out.println(String.format("Task with Id: %d is not found in saved tasks", taskId));
         return null;
     }
 
-    public List<Task> findTasksByTaskStatus(TaskStatus taskStatus) {
-        List<Task> tasksWithGivenStatus = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            if (task.getStatus().equals(taskStatus)) {
-                tasksWithGivenStatus.add(task);
-            }
+    public List<Task> findTasksByTitlePart(String titlePart){
+        Objects.requireNonNull(titlePart, "titlePart must be set");
+
+        if (titlePart.isBlank()) {
+            throw new IllegalArgumentException("titlePart must not be blank");
         }
-        return tasksWithGivenStatus;
+
+        return tasks.values().stream()
+                .filter(task-> task.getTitle().contains(titlePart))
+                .toList();
+    }
+
+    public List<Task> findTasksByDescriptionPart(String descriptionPart){
+        Objects.requireNonNull(descriptionPart, "descriptionPart must be set");
+
+        if (descriptionPart.isBlank()) {
+            throw new IllegalArgumentException("descriptionPart must not be blank");
+        }
+
+        return tasks.values().stream()
+                .filter(task -> task.getDescription()
+                        .map(description -> description.contains(descriptionPart))
+                        .orElse(false))
+                .toList();
+    }
+
+    public List<Task> findTasksByTaskStatus(TaskStatus taskStatus) {
+
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        return tasks.values().stream()
+                .filter(task -> task.getStatus().equals(taskStatus))
+                .toList();
     }
 
     public List<Task> findTasksByPriority(Priority taskPriority) {
-        List<Task> tasksWithGivenPriority = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            if (task.getPriority().equals(taskPriority)) {
-                tasksWithGivenPriority.add(task);
-            }
+
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
         }
-        return tasksWithGivenPriority;
+
+        return tasks.values().stream()
+                .filter(task -> task.getPriority().equals(taskPriority))
+                .toList();
     }
 
 //    public List<Task> sortTasksByPriority(){
@@ -102,72 +130,87 @@ public class InMemoryTaskService {
 //        return sortedTasksByPriority;
 //    }
 
-    public List<Task> findTasksByTagName(String tagName) {
-        List<Task> tasksWithGivenTag = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            Set<Label> taskTagEntities = task.getLabels();
-            for (Label label : taskTagEntities) {
-                if (label.getName().equals(tagName)) {
-                    tasksWithGivenTag.add(task);
-                }
-            }
+    public List<Task> findTasksByLabelName(String labelName) {
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
         }
-        return tasksWithGivenTag;
+
+        String normalizedLabelName = Objects.requireNonNull(labelName, "noteId must be set").trim().toLowerCase();
+
+        return tasks.values().stream()
+                .filter(task -> task.getLabels().stream()
+                .anyMatch(label -> label.getName().equals(normalizedLabelName)))
+                .toList();
     }
 
     public List<Task> getOverdueTasks(LocalDateTime dateTime) {
-        List<Task> overdueTasks = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            if (task.isOverdue(dateTime)) {
-                overdueTasks.add(task);
-            }
+
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
         }
-        return overdueTasks;
+
+        return tasks.values().stream()
+                .filter(task -> task.isOverdue(dateTime))
+                .toList();
     }
 
-    public List<Task> getTodayTasks() {
-        LocalDate today = LocalDateTime.now().toLocalDate();
-        List<Task> todayTasks = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            task.getDeadline().ifPresent(
-                    new Consumer<LocalDateTime>() {
-                        @Override
-                        public void accept(LocalDateTime presentDeadline) {
-                            if (presentDeadline.toLocalDate().isEqual(today) &&
-                                    !task.getStatus().equals(TaskStatus.DONE) && !task.getStatus().equals(TaskStatus.CANCELLED)) {
-                                todayTasks.add(task);
-                            }
-                        }
-                    }
-            );
+    public List<Task> getTodayDeadlineTasks() {
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
         }
-        return todayTasks;
+
+        LocalDate today = LocalDateTime.now().toLocalDate();
+
+        return tasks.values().stream()
+                .filter(task -> task.isStatusRequiredToDo() &&
+                        task.getDeadline()
+                        .map(deadline -> deadline.toLocalDate().isEqual(today))
+                        .orElse(false))
+                .toList();
+    }
+
+    public List<Task> getConcreteDayDeadlineTasks(LocalDate date) {
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        return tasks.values().stream()
+                .filter(task -> task.isStatusRequiredToDo() &&
+                        task.getDeadline()
+                                .map(deadline -> deadline.toLocalDate().isEqual(date))
+                                .orElse(false))
+                .toList();
     }
 
     public List<Task> getTasksWithoutDeadline() {
-        List<Task> tasksWithoutDeadline = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            if (task.getDeadline() == null) {
-                tasksWithoutDeadline.add(task);
-            }
+        if (tasks.isEmpty()) {
+            return new ArrayList<>();
         }
-        return tasksWithoutDeadline;
+
+        return tasks.values().stream()
+                .filter(task -> task.getDeadline().isEmpty())
+                .toList();
     }
 
     public List<Task> sortTasksByDeadlineFromEarliestToLatest() {
-        List<Task> sortedTasks = new ArrayList<>(tasks.values());
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
+        }
 
-        sortedTasks.sort(
-                Comparator.comparing(task -> task.getDeadline().orElse(LocalDateTime.MAX))
-        );
-
-        return sortedTasks;
+        return tasks.values().stream()
+                .sorted(Comparator.comparing(task -> task.getDeadline().orElse(LocalDateTime.MAX)))
+                .toList();
     }
 
     public List<Task> sortTasksByCreationDateTimeEarliestToLatest() {
-        List<Task> sortedTask = tasks.values().stream().toList();
-        sortedTask.sort(Comparator.comparing(Task::getCreatedAt));
-        return sortedTask;
+
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        return tasks.values().stream()
+                .sorted(Comparator.comparing(Task::getCreatedAt))
+                .toList();
     }
 
 }

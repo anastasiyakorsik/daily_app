@@ -72,31 +72,37 @@ public class TaskTest {
     }
 
 
-//    @Test
-//    @DisplayName("Add label to task")
-//    @Tag("tags")
-//    void addLabelToTask(){
-//        Task test_task = new Task(1L, "test_title", Priority.LOW);
-//
-//        Label test_label = new Label(2L, "test_label", "red", true);
-//        test_task.addLabel(test_label);
-//
-//        assertTrue(test_task.getLabels().contains(test_label));
-//    }
-//
-//    @Test
-//    @DisplayName("Дубликат тега не появляется.")
-//    @Tag("tags")
-//    void whenEqualTagsThenDuplicateNotAddedToTask(){
-//        Task test_task = new Task(1L, "test_title", Priority.LOW);
-//
-//        Label test_tag_1 = new Label(2L, "test_tag", "red", true);
-//        Label test_tag_2 = new Label(3L, "Test_Tag", "blue", true);
-//        test_task.addLabel(test_tag_1);
-//        test_task.addLabel(test_tag_2);
-//
-//        assertEquals(1, test_task.getLabels().size());
-//    }
+    @Test
+    @DisplayName("Add label to task")
+    @Tag("Labels")
+    void addLabelToTask(){
+        Task test_task = Task.builder()
+                .id(1L)
+                .title("test_task")
+                .build();
+
+        Label test_label = new Label(2L, "test_label", null, true);
+        test_task.addLabel(test_label);
+
+        assertTrue(test_task.containsLabel(test_label.getName()));
+    }
+
+    @Test
+    @DisplayName("Can not add the same Label to task")
+    @Tag("Labels")
+    void whenEqualTagsThenDuplicateNotAddedToTask(){
+        Task test_task = Task.builder()
+                .id(1L)
+                .title("test_task")
+                .build();
+
+        Label test_tag_1 = new Label(2L, "test_tag", null, true);
+        Label test_tag_2 = new Label(3L, "Test_Tag", null, true);
+        test_task.addLabel(test_tag_1);
+        test_task.addLabel(test_tag_2);
+
+        assertEquals(1, test_task.getLabels().size());
+    }
 
     // deadline / overdue
 

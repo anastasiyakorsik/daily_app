@@ -20,14 +20,13 @@ public class LabelTest {
     void createCorrectLabel(){
         Long id = 1L;
         String tag_name = "tag_name";
-        String tag_color = "tag_color";
         boolean is_tag_custom = true;
 
-        Label test_label = new Label(id, tag_name, tag_color, is_tag_custom);
+        Label test_label = new Label(id, tag_name, null, is_tag_custom);
 
         assertEquals(id, test_label.getId());
         assertEquals(tag_name, test_label.getName());
-        assertEquals(tag_color, test_label.getColor());
+        assertEquals(LabelColor.TRANSPARENT, test_label.getColor());
         assertEquals(is_tag_custom, test_label.isCustom());
     }
 
@@ -35,7 +34,7 @@ public class LabelTest {
     @DisplayName("Create Label with null name")
     void createNullNameLabel(){
         assertThrows(IllegalArgumentException.class,
-                () -> new Label(1L, null, "tag_color", true),
+                () -> new Label(1L, null, null, true),
                 "Label name can not be null.");
     }
 
@@ -43,7 +42,7 @@ public class LabelTest {
     @DisplayName("Create Label with empty name")
     void createEmptyNameLabel(){
         assertThrows(IllegalArgumentException.class,
-                () -> new Label(1L, "", "tag_color", true),
+                () -> new Label(1L, "", null, true),
                 "Label name can not be empty or contains only spaces.");
     }
 
@@ -51,7 +50,7 @@ public class LabelTest {
     @DisplayName("Create Label with name of spaces")
     void createNameOfSpacesLabel(){
         assertThrows(IllegalArgumentException.class,
-                () -> new Label(1L, "  ", "tag_color", true),
+                () -> new Label(1L, "  ", null, true),
                 "Label name can not be empty or contains only spaces.");
     }
 
@@ -61,8 +60,8 @@ public class LabelTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new Label(1L,
                         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                        "tag_color", true),
-                "Label name is too big. Please, make it shorter.");
+                        null, true),
+                "Label name is too big. Please, make it shorter than 120.");
     }
 
     // normalization
@@ -72,10 +71,9 @@ public class LabelTest {
     void createUpperCaseNameLabel(){
         Long id = 1L;
         String tag_name = "TEST";
-        String tag_color = "tag_color";
         boolean is_tag_custom = true;
 
-        Label test_label = new Label(id, tag_name, tag_color, is_tag_custom);
+        Label test_label = new Label(id, tag_name, null, is_tag_custom);
         assertEquals("test", test_label.getName());
     }
 
@@ -84,10 +82,9 @@ public class LabelTest {
     void createDifferentLetterCaseNameLabel(){
         Long id = 1L;
         String tag_name = "TeSt";
-        String tag_color = "tag_color";
         boolean is_tag_custom = true;
 
-        Label test_label = new Label(id, tag_name, tag_color, is_tag_custom);
+        Label test_label = new Label(id, tag_name, null, is_tag_custom);
         assertEquals("test", test_label.getName());
     }
 
@@ -97,8 +94,8 @@ public class LabelTest {
     @DisplayName("Labels with same names equals")
     void whenSameNameThenEqualsTrue(){
         // Arrange
-        Label tag_Entity_1 = new Label(1L, "work", "blue", false);
-        Label tag_Entity_2 = new Label(2L, " Work", "red", false);
+        Label tag_Entity_1 = new Label(1L, "work", LabelColor.BLUE, false);
+        Label tag_Entity_2 = new Label(2L, " Work", LabelColor.RED, false);
 
         //Assert
         assertEquals(tag_Entity_1, tag_Entity_2);
@@ -109,8 +106,8 @@ public class LabelTest {
     @DisplayName("Labels with different names does not equal")
     void whenDifferentNameThenEqualsFalse(){
         // Arrange
-        Label tag_Entity_1 = new Label(1L, "work", "blue", false);
-        Label tag_Entity_2 = new Label(2L, " _Work", "red", false);
+        Label tag_Entity_1 = new Label(1L, "work", LabelColor.BLUE, false);
+        Label tag_Entity_2 = new Label(2L, " _Work", LabelColor.GREEN, false);
 
         //Assert
         assertNotEquals(tag_Entity_1, tag_Entity_2);
@@ -121,8 +118,8 @@ public class LabelTest {
     @DisplayName("Same Labels have equal hashcode")
     void whenSameNameThenSameHashCode(){
         // Arrange
-        Label tag_Entity_1 = new Label(1L, "work", "blue", false);
-        Label tag_Entity_2 = new Label(2L, " Work", "red", false);
+        Label tag_Entity_1 = new Label(1L, "work", LabelColor.BLUE, false);
+        Label tag_Entity_2 = new Label(2L, " Work", LabelColor.RED, false);
 
         //Assert
         assertEquals(tag_Entity_1.hashCode(), tag_Entity_2.hashCode());
@@ -135,8 +132,8 @@ public class LabelTest {
     @DisplayName("HashSet<Label> does not add logically equal Labels")
     void whenTagsHaveTheSameNameThenHashsetDoesNotCollectBoth(){
         // Arrange
-        Label first = new Label(1L, "work", "blue", true);
-        Label second = new Label(2L, " WORK ", "red", false);
+        Label first = new Label(1L, "work", LabelColor.BLUE, true);
+        Label second = new Label(2L, " WORK ", LabelColor.RED, false);
         Set<Label> tagEntities = new HashSet<>();
 
         // Act
@@ -152,8 +149,8 @@ public class LabelTest {
     @DisplayName("contains() for HashSet is true for equal Label")
     void whenTagsHaveTheSameNameThenHashsetContainsIsTrueForEqualOne(){
         // Arrange
-        Label first = new Label(1L, "work", "blue", true);
-        Label second = new Label(2L, " WORK ", "red", false);
+        Label first = new Label(1L, "work", LabelColor.BLUE, true);
+        Label second = new Label(2L, " WORK ", LabelColor.RED, false);
         Set<Label> tagEntities = new HashSet<>();
 
         // Act

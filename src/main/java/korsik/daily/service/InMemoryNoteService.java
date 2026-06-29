@@ -36,7 +36,7 @@ public class InMemoryNoteService {
         //System.out.println("Given note was successfully saved");
     }
 
-    public boolean addTagToNote(Long noteId, Label label){
+    public boolean addLabelToNote(Long noteId, Label label){
 
         if (notes.containsKey(Objects.requireNonNull(noteId, "noteId must be set"))) {
             return notes.get(noteId).addLabel(Objects.requireNonNull(label, "label must be set"));
@@ -44,7 +44,7 @@ public class InMemoryNoteService {
         return false;
     }
 
-    public boolean deleteTagFromNote(Long noteId, Label label){
+    public boolean deleteLabelFromNote(Long noteId, Label label){
         if (notes.containsKey(Objects.requireNonNull(noteId, "noteId must be set"))) {
             return notes.get(noteId).removeLabel(Objects.requireNonNull(label, "label must be set"));
         }
@@ -64,6 +64,11 @@ public class InMemoryNoteService {
     }
 
     public List<Note> findNotesByLabelName(String labelName) {
+
+        if (notes.isEmpty()){
+            return new ArrayList<>();
+        }
+
         String normalizedLabelName = Objects.requireNonNull(labelName, "noteId must be set").trim().toLowerCase();
 
         return notes.values().stream()
@@ -87,6 +92,10 @@ public class InMemoryNoteService {
 //    }
 
     public List<Note> findNotesByTitlePart(String titlePart){
+        if (notes.isEmpty()){
+            return new ArrayList<>();
+        }
+
         Objects.requireNonNull(titlePart, "titlePart must be set");
 
         return notes.values().stream()
@@ -95,6 +104,10 @@ public class InMemoryNoteService {
     }
 
     public List<Note> findNotesByContentPart(String contentPart){
+        if (notes.isEmpty()){
+            return new ArrayList<>();
+        }
+
         Objects.requireNonNull(contentPart, "contentPart must be set");
 
         return notes.values().stream()

@@ -9,13 +9,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
 
-//todo builder
 public class Expense {
 
     private final Long id;
     private final BigDecimal amount; //todo прочитать про double vs bigdeciaml
-    private ExpenseCategory category;
-    private String comment;
+    private final ExpenseCategory category;
+    private final String comment;
     private final LocalDateTime date;
     private final Currency currency;
 
@@ -39,11 +38,11 @@ public class Expense {
     }
 
     public Optional<ExpenseCategory> getCategory() {
-        return Optional.of(category);
+        return Optional.ofNullable(category);
     }
 
     public Optional<String> getComment() {
-        return Optional.of(comment);
+        return Optional.ofNullable(comment);
     }
 
     public LocalDateTime getDate() {
@@ -63,8 +62,8 @@ public class Expense {
         private BigDecimal amount; //todo прочитать про double vs bigdeciaml
         private ExpenseCategory category;
         private String comment;
-        private LocalDateTime date;
-        private Currency currency;
+        private LocalDateTime date = LocalDateTime.now();;
+        private Currency currency = defaultCurrency;
 
         public Builder id(Long id){
             this.id = Objects.requireNonNull(id, "id must not be null");
@@ -87,17 +86,12 @@ public class Expense {
         }
 
         public Builder date(LocalDateTime date){
-            if (date == null){
-                date = LocalDateTime.now();
-            }
+            this.date = Objects.requireNonNull(date, "date must be set");
             return this;
         }
 
         public Builder currency(Currency currency){
-            if (currency == null){
-                currency = defaultCurrency;
-            }
-            this.currency = currency;
+            this.currency = Objects.requireNonNull(currency, "currency must be set");
             return this;
         }
 
@@ -107,8 +101,48 @@ public class Expense {
 
     }
 
+    public Expense withComment(String comment){
+        if (comment == null){
+            throw new NullPointerException("comment must be set");
+        }
+        if (comment.isEmpty()){
+            throw new IllegalArgumentException("comment can not be empty");
+        }
+        if (comment.isBlank()){
+            throw new IllegalArgumentException("comment can not be blank");
+        }
+        return Expense.builder()
+                .id(this.id)
+                .amount(this.amount)
+                .category(this.category)
+                .comment(comment)
+                .date(this.date)
+                .currency(this.currency)
+                .build();
+
+    }
+
+    public Expense withCategory(ExpenseCategory category){
+        if (category == null){
+            throw new NullPointerException("category must be set");
+        }
+        return Expense.builder()
+                .id(this.id)
+                .amount(this.amount)
+                .category(category)
+                .comment(this.comment)
+                .date(this.date)
+                .currency(this.currency)
+                .build();
+
+    }
+
     public static void setDefaultCurrency(Currency currency){
         defaultCurrency = Objects.requireNonNull(currency, "default currency must not be null");
+    }
+
+    public static Currency getDefaultCurrency(){
+        return defaultCurrency;
     }
 
     @Override

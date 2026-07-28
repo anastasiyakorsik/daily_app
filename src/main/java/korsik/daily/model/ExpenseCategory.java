@@ -51,7 +51,11 @@ public class ExpenseCategory {
 
     public void setColor(ExpenseCategoryColor color) {
 
-        this.color = Objects.requireNonNull(color, "color must be set");
+        if (Objects.requireNonNull(color, "color must be set").equals(this.color)){
+            throw new IllegalArgumentException("To change color provide different one");
+        }
+
+        this.color = color;
     }
 
     public boolean isCustom() {

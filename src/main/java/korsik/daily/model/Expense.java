@@ -2,6 +2,7 @@ package korsik.daily.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
@@ -62,7 +63,7 @@ public class Expense {
         private BigDecimal amount; //todo прочитать про double vs bigdeciaml
         private ExpenseCategory category;
         private String comment;
-        private LocalDateTime date = LocalDateTime.now();;
+        private LocalDateTime date = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         private Currency currency = defaultCurrency;
 
         public Builder id(Long id){
@@ -86,7 +87,7 @@ public class Expense {
         }
 
         public Builder date(LocalDateTime date){
-            this.date = Objects.requireNonNull(date, "date must be set");
+            this.date = Objects.requireNonNull(date.truncatedTo(ChronoUnit.SECONDS), "date must be set");
             return this;
         }
 

@@ -3,15 +3,19 @@ package korsik.daily.model;
 import javax.print.attribute.standard.JobKOctets;
 import javax.swing.plaf.ButtonUI;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Note {
 
-    private static final int MAX_TITLE_LENGTH = 120;
+    private static final int MAX_TITLE_LENGTH = 10;
     private static AtomicLong currentId = new AtomicLong(0L);
 
     private final Long id;
@@ -27,8 +31,9 @@ public class Note {
         this.title = builder.title;
         this.content = builder.content;
 
-        this.createdAt = LocalDateTime.now();
-        this.updateAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        this.updateAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        this.labels = new HashSet<>();
     }
 
     public Long getId() {
@@ -75,7 +80,10 @@ public class Note {
         if (labelName == null){
             throw new NullPointerException("label name must not be null");
         }
-        if (labels == null || labelName.isEmpty()){
+        if (labelName.isBlank()){
+            throw new IllegalArgumentException("label name must be not empty or contains only spaces");
+        }
+        if (labels == null){
             return false;
         }
         for (Label label : labels){
@@ -87,7 +95,7 @@ public class Note {
     }
 
     public void setUpdateAt() {
-        this.updateAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
     //todo
@@ -106,6 +114,10 @@ public class Note {
 //    public Map<Long, NoteLinkType> getNoteLinks() {
 //        return noteLinks;
 //    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
     public static class Builder {
         private Long id;

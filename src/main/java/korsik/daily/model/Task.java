@@ -11,6 +11,11 @@ public class Task {
     private static final int MAX_TITLE_LENGTH = 120;
     private static final int MAX_DESCRIPTION_LENGTH = 200;
 
+    //todo 8 aug 2026: add field finishedAt
+    //todo 10 aug 2026: add filed describing if task is needed to be repeated in certain period of time
+    // private boolean repeatable;
+    // private List<LocalDateTime> repeatTime - currently do not understand;
+    // need to think of; maybe Enum for repeatableType: DAILY, WEEKLY, BIWEEKLY, MONTHLY, QUARTERLY, ANNUAL, DECADELY, etc
     private final Long id;
     private final String title;
     private final LocalDateTime createdAt; //do not add to builder
@@ -181,6 +186,10 @@ public class Task {
     //todo make multiple methods with validation
     public void changeStatus(TaskStatus status) {
         this.status = Objects.requireNonNull(status, "Status must not be null");
+//        if (status == TaskStatus.CANCELLED || status == TaskStatus.DONE) {
+//
+//            //todo: finishedAt
+//        }
     }
 
     public void setDeadline(LocalDateTime newDeadline){

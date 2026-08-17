@@ -69,7 +69,7 @@ public class InMemoryTaskService {
         if (tasks.containsKey(Objects.requireNonNull(taskId, "taskId must be set"))) {
             return Optional.ofNullable(tasks.get(taskId));
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<Task> findTasksByTitlePart(String titlePart){
@@ -77,6 +77,10 @@ public class InMemoryTaskService {
 
         if (titlePart.isBlank()) {
             throw new IllegalArgumentException("titlePart must not be blank");
+        }
+
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
         }
 
         return tasks.values().stream()
@@ -91,6 +95,10 @@ public class InMemoryTaskService {
             throw new IllegalArgumentException("descriptionPart must not be blank");
         }
 
+        if (tasks.isEmpty()){
+            return new ArrayList<>();
+        }
+
         return tasks.values().stream()
                 .filter(task -> task.getDescription()
                         .map(description -> description.contains(descriptionPart))
@@ -99,6 +107,8 @@ public class InMemoryTaskService {
     }
 
     public List<Task> findTasksByTaskStatus(TaskStatus taskStatus) {
+
+        Objects.requireNonNull(taskStatus, "taskStatus must be set");
 
         if (tasks.isEmpty()){
             return new ArrayList<>();
@@ -110,6 +120,8 @@ public class InMemoryTaskService {
     }
 
     public List<Task> findTasksByPriority(Priority taskPriority) {
+
+        Objects.requireNonNull(taskPriority, "taskPriority must be set");
 
         if (tasks.isEmpty()){
             return new ArrayList<>();
@@ -135,7 +147,11 @@ public class InMemoryTaskService {
             return new ArrayList<>();
         }
 
-        String normalizedLabelName = Objects.requireNonNull(labelName, "noteId must be set").trim().toLowerCase();
+        if (labelName.isBlank()){
+            throw new IllegalArgumentException("labelName must not be blank");
+        }
+
+        String normalizedLabelName = Objects.requireNonNull(labelName, "labelName must be set").trim().toLowerCase();
 
         return tasks.values().stream()
                 .filter(task -> task.getLabels().stream()
@@ -150,7 +166,7 @@ public class InMemoryTaskService {
         }
 
         return tasks.values().stream()
-                .filter(task -> task.isOverdue(dateTime))
+                .filter(task -> task.isOverdue(Objects.requireNonNull(dateTime, "dateTime must be set")))
                 .toList();
     }
 
@@ -177,7 +193,7 @@ public class InMemoryTaskService {
         return tasks.values().stream()
                 .filter(task -> task.isStatusRequiredToDo() &&
                         task.getDeadline()
-                                .map(deadline -> deadline.toLocalDate().isEqual(date))
+                                .map(deadline -> deadline.toLocalDate().isEqual(Objects.requireNonNull(date, "date must be set")))
                                 .orElse(false))
                 .toList();
     }
@@ -212,5 +228,7 @@ public class InMemoryTaskService {
                 .sorted(Comparator.comparing(Task::getCreatedAt))
                 .toList();
     }
+
+    //todo: get finished tasks
 
 }

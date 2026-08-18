@@ -176,7 +176,7 @@ public class Task {
             return false;
         }
 
-        if (dateTime.isAfter(deadline)) {
+        if (dateTime.isBefore(deadline)) {
             return false;
         }
 

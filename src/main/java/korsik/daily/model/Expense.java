@@ -67,12 +67,12 @@ public class Expense {
         private Currency currency = defaultCurrency;
 
         public Builder id(Long id){
-            this.id = Objects.requireNonNull(id, "id must not be null");
+            this.id = id;
             return this;
         }
 
         public Builder amount(BigDecimal amount){
-            this.amount = Objects.requireNonNull(amount, "amount must not be null");
+            this.amount = amount;
             return this;
         }
 
@@ -87,16 +87,20 @@ public class Expense {
         }
 
         public Builder date(LocalDateTime date){
-            this.date = Objects.requireNonNull(date.truncatedTo(ChronoUnit.SECONDS), "date must be set");
+            this.date = date.truncatedTo(ChronoUnit.SECONDS);
             return this;
         }
 
         public Builder currency(Currency currency){
-            this.currency = Objects.requireNonNull(currency, "currency must be set");
+            this.currency = currency;
             return this;
         }
 
         public Expense build(){
+            Objects.requireNonNull(id, "id must not be null");
+            Objects.requireNonNull(amount, "amount must not be null");
+            Objects.requireNonNull(date, "date must be set");
+            Objects.requireNonNull(currency, "currency must be set");
             return new Expense(this);
         }
 

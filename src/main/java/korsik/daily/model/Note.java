@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Note {
 
     private static final int MAX_TITLE_LENGTH = 10;
-    private static AtomicLong currentId = new AtomicLong(0L);
+    //private static AtomicLong currentId = new AtomicLong(0L);
 
     private final Long id;
     private final String title;
@@ -125,11 +125,22 @@ public class Note {
         private String content;
 
         public Builder id(Long id){
-            this.id = Objects.requireNonNull(id, "id must not be null");
+            this.id = id;
             return this;
         }
 
         public Builder title(String title){
+            this.title = title;
+            return this;
+        }
+
+        public Builder content(String content){
+            this.content = content;
+            return this;
+        }
+
+        public Note build(){
+            Objects.requireNonNull(id, "id must not be null");
             if (title == null) {
                 throw new NullPointerException("Note title can not be null.");
             }
@@ -141,17 +152,8 @@ public class Note {
             if (title.length() > MAX_TITLE_LENGTH) {
                 throw new IllegalArgumentException("Note title. Please, make it shorter");
             }
+            Objects.requireNonNull(content, "content must not be null");
 
-            this.title = title;
-            return this;
-        }
-
-        public Builder content(String content){
-            this.content = Objects.requireNonNull(content, "content must not be null");
-            return this;
-        }
-
-        public Note build(){
             return new Note(this);
         }
     }

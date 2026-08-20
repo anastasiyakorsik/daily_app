@@ -13,7 +13,7 @@ public class Label {
     private static final int MAX_LABEL_NAME_LENGTH = 120;
 
     public Label(Long id, String name, LabelColor color, boolean custom) {
-        this.id = id;
+        this.id = Objects.requireNonNull(id, "id must be set");
         this.name = normalizeAndValidateName(name);
         this.color = color == null ? LabelColor.TRANSPARENT : color;
         this.custom = custom;

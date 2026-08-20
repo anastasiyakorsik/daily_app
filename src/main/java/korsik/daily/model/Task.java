@@ -105,11 +105,38 @@ public class Task {
         private Priority priority;
 
         public Builder id(Long id){
-            this.id = Objects.requireNonNull(id, "id must not be null");
+            this.id = id;
             return this;
         }
 
         public Builder title(String title){
+            this.title = title.trim();
+            return this;
+        }
+
+        public Builder description(String description){
+            this.description = description;
+            return this;
+        }
+
+        public Builder deadline(LocalDateTime deadline){
+            this.deadline = deadline;
+            return this;
+        }
+
+        public Builder status(TaskStatus status){
+            this.status = status == null ? TaskStatus.PLANNED : status;
+            return this;
+        }
+
+        public Builder priority(Priority priority){
+            this.priority = priority == null ? Priority.LOW : priority;
+            return this;
+        }
+
+        public Task build() {
+            Objects.requireNonNull(id, "id must not be null");
+
             if (title == null) {
                 throw new IllegalArgumentException("Title of task can not be null.");
             }
@@ -122,11 +149,6 @@ public class Task {
                 throw new IllegalArgumentException("Title is too big. Please, make it shorter.");
             }
 
-            this.title = title.trim();
-            return this;
-        }
-
-        public Builder description(String description){
             if (description == null) {
                 throw new IllegalArgumentException("Description can not be null.");
             }
@@ -134,32 +156,7 @@ public class Task {
             if (description.length() > MAX_DESCRIPTION_LENGTH) {
                 throw new IllegalArgumentException("Description is too big. Please, make it shorter");
             }
-            this.description = description;
-            return this;
-        }
 
-        public Builder deadline(LocalDateTime deadline){
-            this.deadline = deadline;
-            return this;
-        }
-
-        public Builder status(TaskStatus status){
-            if (status == null){
-                status = TaskStatus.PLANNED;
-            }
-            this.status = status;
-            return this;
-        }
-
-        public Builder priority(Priority priority){
-            if (priority == null){
-                priority = Priority.LOW;
-            }
-            this.priority = priority;
-            return this;
-        }
-
-        public Task build() {
             return new Task(this);
         }
     }
@@ -183,12 +180,12 @@ public class Task {
         return isStatusRequiredToDo();
     }
 
-    //todo make multiple methods with validation
+    //todo (6/27/2026) make multiple methods with validation
     public void changeStatus(TaskStatus status) {
         this.status = Objects.requireNonNull(status, "Status must not be null");
 //        if (status == TaskStatus.CANCELLED || status == TaskStatus.DONE) {
 //
-//            //todo: finishedAt
+//            //todo: finishedAt (8/17/2026)
 //        }
     }
 
@@ -199,7 +196,7 @@ public class Task {
         this.deadline = newDeadline;
     }
 
-    //todo
+    //todo (6/27/2026)
     public void rescheduleDeadline(){
         return;
     }

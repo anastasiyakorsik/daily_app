@@ -36,10 +36,17 @@ public class InMemoryTaskService {
 
     //todo logging!
     public void addTask(Task task) {
+        if (tasks.containsKey(task.getId())) {
+            throw new IllegalArgumentException(String.format("Task with id %d is already added", task.getId()));
+        }
         tasks.put(
                 Objects.requireNonNull(task, "task may not be null").getId(),
                 task
         );
+    }
+
+    public void updateTask(Task task){
+        tasks.put(Objects.requireNonNull(task.getId()), task);
     }
 
     public boolean changeTaskStatus(Long taskId, TaskStatus newStatus) {

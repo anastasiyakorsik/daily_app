@@ -1,5 +1,6 @@
 package korsik.daily.service;
 
+import korsik.daily.model.Expense;
 import korsik.daily.model.Note;
 import korsik.daily.model.NoteLinkType;
 import korsik.daily.model.Label;
@@ -31,9 +32,18 @@ public class InMemoryNoteService {
     }
 
     public void addNote(Note note){
+
+        if (notes.containsKey(note.getId())) {
+            throw new IllegalArgumentException(String.format("Note with id %d is already added", note.getId()));
+        }
+
         notes.put(Objects.requireNonNull(note, "note must not be null").getId(),
                 note);
         //System.out.println("Given note was successfully saved");
+    }
+
+    public void updateNote(Note note){
+        notes.put(Objects.requireNonNull(note.getId()), note);
     }
 
     public boolean addLabelToNote(Long noteId, Label label){

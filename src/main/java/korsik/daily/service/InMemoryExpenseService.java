@@ -30,6 +30,14 @@ public class InMemoryExpenseService {
     }
 
     public void addExpense(Expense expense){
+
+        if (expenses.containsKey(expense.getId())) {
+            throw new IllegalArgumentException(String.format("Expense with id %d is already added", expense.getId()));
+        }
+        expenses.put(Objects.requireNonNull(expense.getId()), expense);
+    }
+
+    public void updateExpense(Expense expense){
         expenses.put(Objects.requireNonNull(expense.getId()), expense);
     }
 

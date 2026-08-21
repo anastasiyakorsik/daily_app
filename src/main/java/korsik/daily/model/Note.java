@@ -49,7 +49,10 @@ public class Note {
     }
 
     public Set<Label> getLabels() {
-        return labels;
+        if (labels == null){
+            return Set.of();
+        }
+        return Set.copyOf(labels);
     }
 
     public LocalDateTime getCreatedAt() {

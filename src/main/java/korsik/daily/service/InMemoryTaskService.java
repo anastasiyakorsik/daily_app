@@ -30,8 +30,8 @@ public class InMemoryTaskService {
         this(new HashMap<>());
     }
 
-    public Collection<Task> getAllTasks() {
-        return tasks.values();
+    public List<Task> getAllTasks() {
+        return List.copyOf(tasks.values());
     }
 
     //todo logging!
@@ -95,10 +95,6 @@ public class InMemoryTaskService {
             throw new IllegalArgumentException("descriptionPart must not be blank");
         }
 
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
-
         return tasks.values().stream()
                 .filter(task -> task.getDescription()
                         .map(description -> description.contains(descriptionPart))
@@ -110,10 +106,6 @@ public class InMemoryTaskService {
 
         Objects.requireNonNull(taskStatus, "taskStatus must be set");
 
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
-
         return tasks.values().stream()
                 .filter(task -> task.getStatus().equals(taskStatus))
                 .toList();
@@ -122,10 +114,6 @@ public class InMemoryTaskService {
     public List<Task> findTasksByPriority(Priority taskPriority) {
 
         Objects.requireNonNull(taskPriority, "taskPriority must be set");
-
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
 
         return tasks.values().stream()
                 .filter(task -> task.getPriority().equals(taskPriority))
@@ -143,10 +131,6 @@ public class InMemoryTaskService {
 //    }
 
     public List<Task> findTasksByLabelName(String labelName) {
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
-
         if (labelName.isBlank()){
             throw new IllegalArgumentException("labelName must not be blank");
         }
@@ -161,20 +145,12 @@ public class InMemoryTaskService {
 
     public List<Task> getOverdueTasks(LocalDateTime dateTime) {
 
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
-
         return tasks.values().stream()
                 .filter(task -> task.isOverdue(Objects.requireNonNull(dateTime, "dateTime must be set")))
                 .toList();
     }
 
     public List<Task> getTodayDeadlineTasks() {
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
-
         LocalDate today = LocalDateTime.now().toLocalDate();
 
         return tasks.values().stream()
@@ -186,10 +162,6 @@ public class InMemoryTaskService {
     }
 
     public List<Task> getConcreteDayDeadlineTasks(LocalDate date) {
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
-
         return tasks.values().stream()
                 .filter(task -> task.isStatusRequiredToDo() &&
                         task.getDeadline()
@@ -199,30 +171,18 @@ public class InMemoryTaskService {
     }
 
     public List<Task> getTasksWithoutDeadline() {
-        if (tasks.isEmpty()) {
-            return new ArrayList<>();
-        }
-
         return tasks.values().stream()
                 .filter(task -> task.getDeadline().isEmpty())
                 .toList();
     }
 
     public List<Task> sortTasksByDeadlineFromEarliestToLatest() {
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
-
         return tasks.values().stream()
                 .sorted(Comparator.comparing(task -> task.getDeadline().orElse(LocalDateTime.MAX)))
                 .toList();
     }
 
     public List<Task> sortTasksByCreationDateTimeEarliestToLatest() {
-
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
 
         return tasks.values().stream()
                 .sorted(Comparator.comparing(Task::getCreatedAt))

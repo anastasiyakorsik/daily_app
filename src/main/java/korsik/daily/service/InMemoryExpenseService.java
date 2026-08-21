@@ -25,8 +25,8 @@ public class InMemoryExpenseService {
         this(new HashMap<>());
     }
 
-    public Collection<Expense> getAllExpenses(){
-        return expenses.values();
+    public List<Expense> getAllExpenses(){
+        return List.copyOf(expenses.values());
     }
 
     public void addExpense(Expense expense){
@@ -50,40 +50,24 @@ public class InMemoryExpenseService {
 
     //todo maybe round +-
     public List<Expense> findExpensesByAmount(BigDecimal amount){
-        if (expenses.isEmpty()){
-            return List.of();
-        }
-
         return expenses.values().stream()
                 .filter(expense -> expense.getAmount().compareTo(amount) == 0)
                 .toList();
     }
 
     public List<Expense> findCheaperThanExpenses(BigDecimal amount){
-        if (expenses.isEmpty()){
-            return List.of();
-        }
-
         return expenses.values().stream()
                 .filter(expense -> expense.getAmount().compareTo(amount) < 0)
                 .toList();
     }
 
     public List<Expense> findMoreExpensiveThanExpenses(BigDecimal amount){
-        if (expenses.isEmpty()){
-            return List.of();
-        }
-
         return expenses.values().stream()
                 .filter(expense -> expense.getAmount().compareTo(amount) > 0)
                 .toList();
     }
 
     public List<Expense> findByExpenseCategoryName(String expenseCategoryName){
-        if (expenses.isEmpty()){
-            return List.of();
-        }
-
         return expenses.values().stream()
                 .filter(expense -> expense.getCategory()
                         .map(expenseCategory -> expenseCategory.getName().equals(expenseCategoryName))
@@ -92,20 +76,12 @@ public class InMemoryExpenseService {
     }
 
     public List<Expense> findUncategorizedExpenses(){
-        if (expenses.isEmpty()){
-            return List.of();
-        }
-
         return expenses.values().stream()
                 .filter(expense -> expense.getCategory().isEmpty())
                 .toList();
     }
 
     public List<Expense> findByCommentPart(String commentPart){
-        if (expenses.isEmpty()){
-            return List.of();
-        }
-
         return expenses.values().stream()
                 .filter(expense -> expense.getComment()
                         .map(comment -> comment.contains(commentPart))
@@ -114,20 +90,12 @@ public class InMemoryExpenseService {
     }
 
     public List<Expense> findConcreteDayExpenses(LocalDate date){
-        if (expenses.isEmpty()){
-            return List.of();
-        }
-
         return expenses.values().stream()
                 .filter(expense -> expense.getDate().toLocalDate().isEqual(date))
                 .toList();
     }
 
     public List<Expense> findConcreteDayExpenses(){
-        if (expenses.isEmpty()){
-            return List.of();
-        }
-
         LocalDate today = LocalDateTime.now().toLocalDate();
 
         return expenses.values().stream()
@@ -136,10 +104,6 @@ public class InMemoryExpenseService {
     }
 
     public List<Expense> findByCurrencyExpenses(Currency currency){
-        if (expenses.isEmpty()){
-            return List.of();
-        }
-
         return expenses.values().stream()
                 .filter(expense -> expense.getCurrency().equals(currency))
                 .toList();

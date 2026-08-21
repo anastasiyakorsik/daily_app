@@ -26,8 +26,8 @@ public class InMemoryNoteService {
         this(new HashMap<>());
     }
 
-    public Collection<Note> getAllNotes(){
-        return notes.values();
+    public List<Note> getAllNotes(){
+        return List.copyOf(notes.values());
     }
 
     public void addNote(Note note){
@@ -65,10 +65,6 @@ public class InMemoryNoteService {
 
     public List<Note> findNotesByLabelName(String labelName) {
 
-        if (notes.isEmpty()){
-            return new ArrayList<>();
-        }
-
         String normalizedLabelName = Objects.requireNonNull(labelName, "noteId must be set").trim().toLowerCase();
 
         return notes.values().stream()
@@ -92,10 +88,6 @@ public class InMemoryNoteService {
 //    }
 
     public List<Note> findNotesByTitlePart(String titlePart){
-        if (notes.isEmpty()){
-            return new ArrayList<>();
-        }
-
         Objects.requireNonNull(titlePart, "titlePart must be set");
 
         return notes.values().stream()
@@ -104,10 +96,6 @@ public class InMemoryNoteService {
     }
 
     public List<Note> findNotesByContentPart(String contentPart){
-        if (notes.isEmpty()){
-            return new ArrayList<>();
-        }
-
         Objects.requireNonNull(contentPart, "contentPart must be set");
 
         return notes.values().stream()

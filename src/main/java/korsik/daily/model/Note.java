@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class Note {
 
-    private static final int MAX_TITLE_LENGTH = 10;
+    private static final int MAX_TITLE_LENGTH = 100;
     //private static AtomicLong currentId = new AtomicLong(0L);
 
     private final Long id;

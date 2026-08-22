@@ -1,17 +1,10 @@
 package korsik.daily.model;
 
-import javax.print.attribute.standard.JobKOctets;
-import javax.swing.plaf.ButtonUI;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class Note {
 
@@ -23,7 +16,7 @@ public class Note {
     private String content;
     private Set<Label> labels;
     private final LocalDateTime createdAt;
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
     // private Map<Long, NoteLinkType> noteLinks;
 
     public Note(Builder builder) {
@@ -32,7 +25,7 @@ public class Note {
         this.content = builder.content;
 
         this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        this.updateAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        this.updatedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         this.labels = new HashSet<>();
     }
 
@@ -60,7 +53,7 @@ public class Note {
     }
 
     public LocalDateTime getUpdateAt() {
-        return updateAt;
+        return updatedAt;
     }
 
     public boolean addLabel(Label label) {
@@ -98,7 +91,7 @@ public class Note {
     }
 
     public void setUpdateAt() {
-        this.updateAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        this.updatedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
     //todo
@@ -169,7 +162,7 @@ public class Note {
                 ", content='" + content + '\'' +
                 ", tags=" + labels +
                 ", createdAt=" + createdAt +
-                ", updateAt=" + updateAt +
+                ", updateAt=" + updatedAt +
                 '}';
     }
 }

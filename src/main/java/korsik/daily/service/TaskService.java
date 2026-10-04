@@ -1,60 +1,34 @@
 package korsik.daily.service;
 
 import korsik.daily.model.Label;
-import korsik.daily.model.Note;
 import korsik.daily.model.Priority;
 import korsik.daily.model.Task;
 import korsik.daily.model.TaskStatus;
+import korsik.daily.repository.TaskRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
 
-public class InMemoryTaskService {
-    private final Map<Long, Task> tasks;
+// use find... for search methods
+public class TaskService {
 
-    public InMemoryTaskService(Map<Long, Task> tasks) {
-        this.tasks = Objects.requireNonNull(tasks, "tasks may not be null");
+    private final TaskRepository repository;
+
+    public TaskService(TaskRepository repository) {
+        this.repository = repository;
     }
 
-    public InMemoryTaskService() {
-        this(new HashMap<>());
-    }
-
-    public List<Task> getAllTasks() {
-        return List.copyOf(tasks.values());
-    }
-
-    //todo logging!
-    public void addTask(Task task) {
-        if (tasks.containsKey(task.getId())) {
-            throw new IllegalArgumentException(String.format("Task with id %d is already added", task.getId()));
-        }
-        tasks.put(
-                Objects.requireNonNull(task, "task may not be null").getId(),
-                task
-        );
-    }
-
-    public void updateTask(Task task){
-        tasks.put(Objects.requireNonNull(task.getId()), task);
-    }
-
+    /*todo: полностью переписать как сервис, не зависящйи от реализации repository
     public boolean changeTaskStatus(Long taskId, TaskStatus newStatus) {
-        if (tasks.containsKey(Objects.requireNonNull(taskId, "taskId must be set"))){
+        if (repository.findAllTasks().contains(Objects.requireNonNull(taskId, "taskId must be set"))) {
             tasks.get(taskId).changeStatus(Objects.requireNonNull(newStatus, "newStatus must be set"));
             return true;
         }
-        return false;
+        throw new IllegalArgumentException("task by id " + taskId + " is absen!");
     }
 
     public boolean addLabelToTask(Long taskId, Label label) {
@@ -73,44 +47,41 @@ public class InMemoryTaskService {
     }
 
     public Optional<Task> findTaskById(Long taskId) {
-        if (tasks.containsKey(Objects.requireNonNull(taskId, "taskId must be set"))) {
-            return Optional.ofNullable(tasks.get(taskId));
-        }
-        return Optional.empty();
+        return Optional.ofNullable(tasks.get(taskId));
     }
 
-    public List<Task> findTasksByTitlePart(String titlePart){
+    public List<Task> findTasksByTitlePart(String titlePart) {
         Objects.requireNonNull(titlePart, "titlePart must be set");
-
         if (titlePart.isBlank()) {
             throw new IllegalArgumentException("titlePart must not be blank");
         }
 
-        if (tasks.isEmpty()){
-            return new ArrayList<>();
-        }
-
         return tasks.values().stream()
-                .filter(task-> task.getTitle().contains(titlePart))
+                .filter(task -> task.getTitle().contains(titlePart))
                 .toList();
     }
 
-    public List<Task> findTasksByDescriptionPart(String descriptionPart){
+    public List<Task> findTasksByDescriptionPart(String descriptionPart) {
         Objects.requireNonNull(descriptionPart, "descriptionPart must be set");
-
         if (descriptionPart.isBlank()) {
             throw new IllegalArgumentException("descriptionPart must not be blank");
         }
 
         return tasks.values().stream()
-                .filter(task -> task.getDescription()
-                        .map(description -> description.contains(descriptionPart))
-                        .orElse(false))
+                //todo мне кажется проще без Optional
+                .filter(task -> {
+                    if (task.getDesc() == null) return false;
+                    return task.getDesc().contains(descriptionPart);
+                })
+                // TODO мне кажется что сверху проще вариант
+                .filter( task -> task.getDescription()
+                            .map(description -> description.contains(descriptionPart))
+                            .orElse(false)
+                )
                 .toList();
     }
 
     public List<Task> findTasksByTaskStatus(TaskStatus taskStatus) {
-
         Objects.requireNonNull(taskStatus, "taskStatus must be set");
 
         return tasks.values().stream()
@@ -119,7 +90,6 @@ public class InMemoryTaskService {
     }
 
     public List<Task> findTasksByPriority(Priority taskPriority) {
-
         Objects.requireNonNull(taskPriority, "taskPriority must be set");
 
         return tasks.values().stream()
@@ -138,15 +108,16 @@ public class InMemoryTaskService {
 //    }
 
     public List<Task> findTasksByLabelName(String labelName) {
-        if (labelName.isBlank()){
+        Objects.requireNonNull(labelName, "labelName is null");
+        if (labelName.isBlank()) {
             throw new IllegalArgumentException("labelName must not be blank");
         }
 
-        String normalizedLabelName = Objects.requireNonNull(labelName, "labelName must be set").trim().toLowerCase();
+        String normalizedLabelName = labelName.trim().toLowerCase();
 
         return tasks.values().stream()
                 .filter(task -> task.getLabels().stream()
-                .anyMatch(label -> label.getName().equals(normalizedLabelName)))
+                        .anyMatch(label -> label.getName().equals(normalizedLabelName)))
                 .toList();
     }
 
@@ -162,12 +133,14 @@ public class InMemoryTaskService {
 
         return tasks.values().stream()
                 .filter(task -> task.isStatusRequiredToDo() &&
+                        // TODO подумай чтоб убрать optional, мне кажется это неудобно - у тебя фильтрация на 4 строчки
                         task.getDeadline()
-                        .map(deadline -> deadline.toLocalDate().isEqual(today))
-                        .orElse(false))
+                                .map(deadline -> deadline.toLocalDate().isEqual(today))
+                                .orElse(false))
                 .toList();
     }
 
+    // TODO точно ли нужен этот метод
     public List<Task> getConcreteDayDeadlineTasks(LocalDate date) {
         return tasks.values().stream()
                 .filter(task -> task.isStatusRequiredToDo() &&
@@ -177,12 +150,14 @@ public class InMemoryTaskService {
                 .toList();
     }
 
+    // TODO зачем этот метод? Отфильтруй незавершенные таски - это тут логично
     public List<Task> getTasksWithoutDeadline() {
         return tasks.values().stream()
                 .filter(task -> task.getDeadline().isEmpty())
                 .toList();
     }
 
+    // TODO задай начальную дату - например сегодня, чтоб не всю историю отображать
     public List<Task> sortTasksByDeadlineFromEarliestToLatest() {
         return tasks.values().stream()
                 .sorted(Comparator.comparing(task -> task.getDeadline().orElse(LocalDateTime.MAX)))
@@ -197,5 +172,7 @@ public class InMemoryTaskService {
     }
 
     //todo: get finished tasks
+
+     */
 
 }

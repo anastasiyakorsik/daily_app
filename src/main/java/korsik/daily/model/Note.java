@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+//todo (9/3/2026): Возможно подумать о том, чтобы добавлять записку именно к конкретному объекту, типа Task, Expense и тп
 public class Note {
 
     private static final int MAX_TITLE_LENGTH = 100;

@@ -22,32 +22,19 @@ public class TaskService {
         this.repository = repository;
     }
 
-    /*todo: полностью переписать как сервис, не зависящйи от реализации repository
     public boolean changeTaskStatus(Long taskId, TaskStatus newStatus) {
-        if (repository.findAllTasks().contains(Objects.requireNonNull(taskId, "taskId must be set"))) {
-            tasks.get(taskId).changeStatus(Objects.requireNonNull(newStatus, "newStatus must be set"));
+        if (repository.existsById(Objects.requireNonNull(taskId, "taskId must be set"))) {
+            repository.findTaskById(taskId).get().changeStatus(Objects.requireNonNull(newStatus, "newStatus must be set"));
             return true;
         }
         throw new IllegalArgumentException("task by id " + taskId + " is absen!");
     }
 
     public boolean addLabelToTask(Long taskId, Label label) {
-        if (tasks.containsKey(Objects.requireNonNull(taskId, "taskId must be set"))) {
-            return tasks.get(taskId).addLabel(Objects.requireNonNull(label, "label must be set"));
+        if (repository.existsById(Objects.requireNonNull(taskId, "taskId must be set"))) {
+            return repository.findTaskById(taskId).get().addLabel(Objects.requireNonNull(label, "label must be set"));
         }
         return false;
-    }
-
-    public boolean removeTaskById(Long taskId) {
-        if (tasks.containsKey(Objects.requireNonNull(taskId, "taskId must be set"))) {
-            tasks.remove(taskId);
-            return true;
-        }
-        return false;
-    }
-
-    public Optional<Task> findTaskById(Long taskId) {
-        return Optional.ofNullable(tasks.get(taskId));
     }
 
     public List<Task> findTasksByTitlePart(String titlePart) {
@@ -56,7 +43,7 @@ public class TaskService {
             throw new IllegalArgumentException("titlePart must not be blank");
         }
 
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .filter(task -> task.getTitle().contains(titlePart))
                 .toList();
     }
@@ -67,13 +54,13 @@ public class TaskService {
             throw new IllegalArgumentException("descriptionPart must not be blank");
         }
 
-        return tasks.values().stream()
-                //todo мне кажется проще без Optional
+        return repository.findAllTasks().stream()
+                //todo (Миша) мне кажется проще без Optional
                 .filter(task -> {
                     if (task.getDesc() == null) return false;
                     return task.getDesc().contains(descriptionPart);
                 })
-                // TODO мне кажется что сверху проще вариант
+                // TODO (Миша) мне кажется что сверху проще вариант
                 .filter( task -> task.getDescription()
                             .map(description -> description.contains(descriptionPart))
                             .orElse(false)
@@ -84,7 +71,7 @@ public class TaskService {
     public List<Task> findTasksByTaskStatus(TaskStatus taskStatus) {
         Objects.requireNonNull(taskStatus, "taskStatus must be set");
 
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .filter(task -> task.getStatus().equals(taskStatus))
                 .toList();
     }
@@ -92,7 +79,7 @@ public class TaskService {
     public List<Task> findTasksByPriority(Priority taskPriority) {
         Objects.requireNonNull(taskPriority, "taskPriority must be set");
 
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .filter(task -> task.getPriority().equals(taskPriority))
                 .toList();
     }
@@ -115,7 +102,7 @@ public class TaskService {
 
         String normalizedLabelName = labelName.trim().toLowerCase();
 
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .filter(task -> task.getLabels().stream()
                         .anyMatch(label -> label.getName().equals(normalizedLabelName)))
                 .toList();
@@ -123,7 +110,7 @@ public class TaskService {
 
     public List<Task> getOverdueTasks(LocalDateTime dateTime) {
 
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .filter(task -> task.isOverdue(Objects.requireNonNull(dateTime, "dateTime must be set")))
                 .toList();
     }
@@ -131,7 +118,7 @@ public class TaskService {
     public List<Task> getTodayDeadlineTasks() {
         LocalDate today = LocalDateTime.now().toLocalDate();
 
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .filter(task -> task.isStatusRequiredToDo() &&
                         // TODO подумай чтоб убрать optional, мне кажется это неудобно - у тебя фильтрация на 4 строчки
                         task.getDeadline()
@@ -142,7 +129,7 @@ public class TaskService {
 
     // TODO точно ли нужен этот метод
     public List<Task> getConcreteDayDeadlineTasks(LocalDate date) {
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .filter(task -> task.isStatusRequiredToDo() &&
                         task.getDeadline()
                                 .map(deadline -> deadline.toLocalDate().isEqual(Objects.requireNonNull(date, "date must be set")))
@@ -152,27 +139,24 @@ public class TaskService {
 
     // TODO зачем этот метод? Отфильтруй незавершенные таски - это тут логично
     public List<Task> getTasksWithoutDeadline() {
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .filter(task -> task.getDeadline().isEmpty())
                 .toList();
     }
 
     // TODO задай начальную дату - например сегодня, чтоб не всю историю отображать
     public List<Task> sortTasksByDeadlineFromEarliestToLatest() {
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .sorted(Comparator.comparing(task -> task.getDeadline().orElse(LocalDateTime.MAX)))
                 .toList();
     }
 
     public List<Task> sortTasksByCreationDateTimeEarliestToLatest() {
 
-        return tasks.values().stream()
+        return repository.findAllTasks().stream()
                 .sorted(Comparator.comparing(Task::getCreatedAt))
                 .toList();
     }
 
     //todo: get finished tasks
-
-     */
-
 }

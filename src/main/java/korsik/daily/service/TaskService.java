@@ -24,15 +24,20 @@ public class TaskService {
 
     public boolean changeTaskStatus(Long taskId, TaskStatus newStatus) {
         if (repository.existsById(Objects.requireNonNull(taskId, "taskId must be set"))) {
-            repository.findTaskById(taskId).get().changeStatus(Objects.requireNonNull(newStatus, "newStatus must be set"));
+            Task task = repository.findTaskById(taskId).get();
+            task.changeStatus(Objects.requireNonNull(newStatus, "newStatus must be set"));
+            repository.update(task);
             return true;
         }
-        throw new IllegalArgumentException("task by id " + taskId + " is absen!");
+        throw new IllegalArgumentException("task by id " + taskId + " is absent!");
     }
 
     public boolean addLabelToTask(Long taskId, Label label) {
         if (repository.existsById(Objects.requireNonNull(taskId, "taskId must be set"))) {
-            return repository.findTaskById(taskId).get().addLabel(Objects.requireNonNull(label, "label must be set"));
+            Task task = repository.findTaskById(taskId).get();
+            boolean addLabelSucceeded = task.addLabel(Objects.requireNonNull(label, "label must be set"));
+            if (addLabelSucceeded) repository.update(task);
+            return addLabelSucceeded;
         }
         return false;
     }
